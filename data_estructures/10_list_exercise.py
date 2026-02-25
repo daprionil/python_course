@@ -26,11 +26,12 @@ class ShoppingCart:
         # Hallar el id máximo y asignarlo con +1
         list_ids = [p["value"] for p in self.my_shopping_cart] or [0]
         new_cart_id = int(max(list_ids)) + 1
+
         self.my_shopping_cart.append(
             {"label": name, "value": new_cart_id, "price": price}
         )
         self.print_display("Producto creado correctamente")
-        self.go_back_menu()
+        self.back_to_menu()
 
     def remove_product(self):
         self.clean_screen()
@@ -55,26 +56,31 @@ class ShoppingCart:
             self.print_display(
                 f"El producto {product.__getitem__(0).__getitem__('label')} se ha eliminado"
             )
-
-        except:
+        except Exception:
             self.print_display("El id del producto es incorrecto")
-        self.go_back_menu()
+
+        self.back_to_menu()
 
     def display_shopping_cart(self, go_to_menu: bool = True):
         self.clean_screen()
+
         self.print_display("###### Tu carrito de compras ######")
+
         # tomar la lista de agregados y mostrarla
         if len(self.my_shopping_cart) == 0:
             self.print_display("No existen productos por mostrar")
         else:
+            items_text: list[str] = []
             for product in self.my_shopping_cart:
-                self.print_display(
-                    f"{product.__getitem__('label')} | {product.__getitem__('price')} | Id: {product.__getitem__('value')}"
+                items_text.append(
+                    f"{product.__getitem__('label')} | {product.__getitem__('price')} | Id: {product.__getitem__('value')}\n"
                 )
+            self.print_display("".join(items_text))
+
         self.input_display("(Enter para continuar...)")
 
         if go_to_menu:
-            self.go_back_menu()
+            self.back_to_menu()
 
     def show_menu(self):
         self.clean_screen()
@@ -107,35 +113,44 @@ class ShoppingCart:
 
     def count_cart(self):
         self.clean_screen()
+
         self.print_display(
             f"Tienes {len(self.my_shopping_cart)} productos en el carrito"
         )
+
         self.input_display("(Enter para continuar)...")
-        self.go_back_menu()
+
+        self.back_to_menu()
 
     def search_product(self):
         self.clean_screen()
+
         # Recibe el nombre
         name_to_search = self.input_display("Escribe el nombre del producto: ")
-        # Lo muestra si lo encuentra
-        product_searched = None
-        for product in self.my_shopping_cart:
-            if name_to_search in str(product["label"]):
-                product_searched = product
-        # Si no lo encuentra un error
-        if product_searched:
-            text = f"id: {product_searched['value']} | {product_searched['label']} | ${product_searched['price']}"
-            self.print_display(text)
 
-        self.go_back_menu()
+        # Busca el producto en el carrito
+        product_found = None
+        for product in self.my_shopping_cart:
+            if name_to_search.lower() in str(product["label"]).lower():
+                product_found = product
+
+        # Lo muestra si lo encuentra
+        if product_found:
+            text = f"id: {product_found['value']} | {product_found['label']} | ${product_found['price']}"
+            self.print_display(text)
+        else:
+            # Si no lo encuentra un error
+            self.print_display(f"El producto [{name_to_search}] no fue encontrado")
+
+        self.back_to_menu()
 
     def clear_cart(self):
         self.clean_screen()
 
         # Limpiar carrito
-        self.my_shopping_cart = []
+        self.my_shopping_cart.clear()
         self.print_display("Carrito limpiado")
-        self.go_back_menu()
+        self.back_to_menu()
 
     def print_display(self, data: str):
         print(f"""
@@ -150,7 +165,7 @@ class ShoppingCart:
     def clean_screen(self):
         os.system("cls" if os.name == "nt" else "clear")
 
-    def go_back_menu(self):
+    def back_to_menu(self):
         time.sleep(2)
         self.clean_screen()
         self.show_menu()
